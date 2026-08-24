@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+*.log
+# Private key material in cert directories (never commit)
+**/certs/**/*-key.pem
+**/certs/**/*.key
+**/certs/**/*.p8
+
+/legal/CLA-REGISTRY.csv
+/.npm-cache-packcheck/
