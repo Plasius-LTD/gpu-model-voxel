@@ -1,4 +1,7 @@
-import { PVOX_MAX_ABSOLUTE_COORDINATE_METRES } from "@plasius/asset-contracts";
+import {
+  GPU_MODEL_STATIC_DEMO_MAX_ABSOLUTE_COORDINATE_METRES,
+  GPU_MODEL_STATIC_DEMO_PROFILE_VERSION,
+} from "@plasius/gpu-model-core";
 
 import {
   assertFinite,
@@ -31,7 +34,7 @@ export const PVOX_STATIC_PREVIEW_LIMITS_V1 = Object.freeze({
 } as const);
 
 /** The only verified gpu-model-core projection accepted by this compiler. */
-export const PVOX_STATIC_COMPILER_INPUT_PROFILE_VERSION_V1 = "plasius.gpu-model-static-demo/1" as const;
+export const PVOX_STATIC_COMPILER_INPUT_PROFILE_VERSION_V1 = GPU_MODEL_STATIC_DEMO_PROFILE_VERSION;
 
 export interface NormalizedSurfaceV1 {
   readonly sourceMaterialIndex: number;
@@ -161,7 +164,7 @@ function normalize(value: Vec3, fieldName: string): Vec3 {
 
 function validateCoordinate(value: number, fieldName: string): number {
   assertFinite(value, fieldName);
-  if (Math.abs(value) > PVOX_MAX_ABSOLUTE_COORDINATE_METRES) {
+  if (Math.abs(value) > GPU_MODEL_STATIC_DEMO_MAX_ABSOLUTE_COORDINATE_METRES) {
     throw new Error(`${fieldName} exceeds the PVOX coordinate ceiling.`);
   }
   return value;

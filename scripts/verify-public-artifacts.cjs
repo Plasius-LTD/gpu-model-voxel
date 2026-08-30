@@ -118,10 +118,10 @@ function validatePackageDirectory(root, packageDirectory) {
 }
 
 function validatePackage(root, packageDirectory) {
-  const absolute = validatePackageDirectory(root, packageDirectory);
+  validatePackageDirectory(root, packageDirectory);
   const output = run(
     "npm",
-    ["pack", "--dry-run", "--json", "--ignore-scripts", absolute],
+    ["pack", "--dry-run", "--json", "--ignore-scripts", packageDirectory],
     { cwd: root }
   );
   let document;

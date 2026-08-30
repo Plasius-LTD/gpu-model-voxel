@@ -99,6 +99,7 @@ export function createPvoxSurfaceMeshV1(
   const positions = new Float32Array(faceCount * 4 * 3);
   const normals = new Float32Array(faceCount * 4 * 3);
   const colors = new Float32Array(faceCount * 4 * 4);
+  const surfaceIndices = new Uint32Array(faceCount * 4);
   const indices = new Uint32Array(faceCount * 6);
   let emittedFaceCount = 0;
   for (const voxel of decoded.voxels) {
@@ -126,6 +127,7 @@ export function createPvoxSurfaceMeshV1(
         for (let channel = 0; channel < 4; channel += 1) {
           colors[(baseVertex + cornerIndex) * 4 + channel] = surface.baseColor[channel]!;
         }
+        surfaceIndices[baseVertex + cornerIndex] = surface.surfaceIndex;
       }
       const indexOffset = emittedFaceCount * 6;
       indices.set([baseVertex, baseVertex + 1, baseVertex + 2, baseVertex, baseVertex + 2, baseVertex + 3], indexOffset);
@@ -149,6 +151,7 @@ export function createPvoxSurfaceMeshV1(
     positions,
     normals,
     colors,
+    surfaceIndices,
     indices,
     triangleCount: indices.length / 3,
     bounds: Object.freeze({ minimum: Object.freeze(minimum), maximum: Object.freeze(maximum) }),

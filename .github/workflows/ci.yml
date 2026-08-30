@@ -9,6 +9,9 @@ permissions:
   actions: read
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   trusted_head:
     name: Trusted head admission
@@ -31,14 +34,20 @@ jobs:
   build-test:
     needs: trusted_head
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
-    runs-on: ${{ fromJSON(github.event_name == 'pull_request' && '["ubuntu-latest"]' || '["self-hosted","Linux","X64"]') }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
+
+      - name: Verify private artifact policy
+        run: npm run privacy:check
+
+      - name: Test private artifact policy
+        run: npm run test:privacy
 
       - name: Install deps
         run: npm ci --no-fund --no-audit --legacy-peer-deps
@@ -55,7 +64,7 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
-      - name: Verify publish inventory
+      - name: Verify public package contents
         run: npm run pack:check
 
       - name: Test with coverage
@@ -108,20 +117,34 @@ jobs:
             exit 1
           }
 
+      - name: Install Codecov CLI
+        continue-on-error: true
+        run: python3 -m pip install --upgrade codecov-cli
+
+      - name: Upload coverage to Codecov
+        continue-on-error: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          codecovcli --verbose upload-process --disable-search --fail-on-error \
+            -n "unittests-${GITHUB_RUN_ID}" \
+            -F unittests \
+            -f "$LCOV_FILE"
+
   # BEGIN PLASIUS PUBLIC ARTIFACT INTEGRITY JOB
   public_artifact_integrity:
     name: Public artifact integrity
     needs: trusted_head
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
-    runs-on: ${{ fromJSON(github.event_name == 'pull_request' && '["ubuntu-latest"]' || '["self-hosted","Linux","X64"]') }}
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
       - name: Verify public artifact integrity

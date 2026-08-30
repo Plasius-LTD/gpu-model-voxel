@@ -22,17 +22,19 @@
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:privacy": "node --test tests/public-package-policy.test.cjs",
     "typecheck": "tsc --noEmit",
     "audit:eslint": "eslint . --max-warnings=0",
-    "audit:deps": "npm ls --all --omit=optional --omit=peer > /dev/null 2>&1 || true",
+    "audit:deps": "npm ls --all --omit=optional --omit=peer",
     "audit:npm": "npm audit --audit-level=high --omit=dev",
     "audit:test": "vitest run --coverage",
-    "audit:all": "npm run typecheck && npm run lint && npm run audit:npm && npm run test:coverage && npm run build && npm run pack:check",
+    "audit:all": "npm run typecheck && npm run audit:eslint && npm run audit:deps && npm run audit:npm && npm run audit:test",
     "lint": "eslint . --max-warnings=0",
     "prepare": "npm run build",
     "clean": "rimraf dist",
     "test:coverage": "vitest run --coverage",
-    "pack:check": "node scripts/verify-public-package.cjs",
+    "pack:check": "npm run privacy:check && node scripts/verify-public-package.cjs",
+    "privacy:check": "node scripts/verify-public-artifacts.cjs --source-only",
     "prepublishOnly": "npm run build && npm run pack:check"
   },
   "keywords": [
@@ -55,6 +57,7 @@
   "homepage": "https://github.com/Plasius-LTD/gpu-model-voxel#readme",
   "dependencies": {
     "@plasius/asset-contracts": "^0.4.0",
+    "@plasius/gpu-model-core": "^0.1.0",
     "fflate": "^0.8.2"
   },
   "devDependencies": {
@@ -84,9 +87,11 @@
     }
   ],
   "overrides": {
-    "brace-expansion": "^5.0.8",
-    "esbuild": "^0.28.1",
-    "minimatch": "^10.2.1"
+    "brace-expansion": "5.0.9",
+    "esbuild": "0.28.2",
+    "minimatch": "^10.2.1",
+    "nanoid": "3.3.18",
+    "postcss": "8.5.26"
   },
   "engines": {
     "node": ">=24"

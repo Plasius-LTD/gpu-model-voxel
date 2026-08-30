@@ -3,97 +3,146 @@ const { execSync } = require("node:child_process");
 const fs = require("node:fs");
 const path = require("node:path");
 
-function main() {
+const FORBIDDEN_TARBALL_PATH_PATTERNS = Object.freeze([
+  { regex: /(?:^|\/)plasius-ltd-site(?:\/|$)/iu },
+  { regex: /(?:^|\/)(frontend|backend|dashboard|infra)(?:\/|$)/iu },
+  { regex: /(?:^|\/)local\.settings(?:\.[^/]+)?\.json$/iu },
+  { regex: /(?:^|\/)host\.json$/iu },
+  { regex: /(?:^|\/)tsp-output(?:\/|$)/iu },
+  { regex: /(?:^|\/)legal\/cla-registry\.csv$/iu },
+]);
+
+function main(argv = process.argv.slice(2)) {
+  if (argv.length === 1 && argv[0] === "--inventory-stdin") {
+    verifyStdinPackageInventory();
+    return;
+  }
+  if (argv.length > 0) {
+    throw new Error("Unsupported public package check arguments.");
+  }
+
   const cacheDir = path.resolve(process.cwd(), ".npm-cache-packcheck");
-  const output = execSync(
-    `npm pack --dry-run --json --ignore-scripts --cache "${cacheDir}"`,
-    {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    }
-  );
-
-  const parsed = parseNpmPackJson(output);
-  const files = Array.isArray(parsed) && parsed[0]?.files ? parsed[0].files : [];
-  const paths = files.map((entry) => entry.path);
-
-  const forbiddenTarballPathPatterns = [
-    {
-      label: "private monorepo path",
-      regex: /(?:^|\/)plasius-ltd-site(?:\/|$)/i,
-    },
-    {
-      label: "private app runtime path",
-      regex: /(?:^|\/)(frontend|backend|dashboard|infra)(?:\/|$)/i,
-    },
-    {
-      label: "local settings artifact",
-      regex: /(?:^|\/)local\.settings(?:\.[^/]+)?\.json$/i,
-    },
-    {
-      label: "azure host artifact",
-      regex: /(?:^|\/)host\.json$/i,
-    },
-    {
-      label: "generated tsp artifact",
-      regex: /(?:^|\/)tsp-output(?:\/|$)/i,
-    },
-  ];
-
-  const forbiddenPaths = paths.filter((filePath) =>
-    forbiddenTarballPathPatterns.some(({ regex }) => regex.test(filePath))
-  );
-
-  if (forbiddenPaths.length > 0) {
-    console.error("Public package check failed. Forbidden publish paths found:");
-    for (const filePath of forbiddenPaths) {
-      console.error(`- ${filePath}`);
-    }
-    process.exit(1);
-  }
-
-  const forbiddenCodeReferencePatterns = [
-    {
-      label: "private monorepo reference",
-      regex: /\bplasius-ltd-site\b/i,
-    },
-    {
-      label: "Plasius Ltd private reference",
-      regex: /\bplasius(?:\s+|-)ltd\b/i,
-    },
-    {
-      label: "proprietary PGP artifact reference",
-      regex: /\bpgp[-_a-z0-9]*\b/i,
-    },
-    {
-      label: "proprietary Lunari artifact reference",
-      regex: /\blunari\b/i,
-    },
-    {
-      label: "proprietary Pixelverse artifact reference",
-      regex: /\bpixelverse\b/i,
-    },
-  ];
-
-  const codeRoots = ["src", "tests", "demo"];
-  const codeExtensions = new Set([".ts", ".tsx", ".js", ".mjs", ".cjs", ".json"]);
-  const violations = scanCodeReferences(
-    codeRoots,
-    codeExtensions,
-    forbiddenCodeReferencePatterns
-  );
-
-  if (violations.length > 0) {
-    console.error(
-      "Public package check failed. Forbidden private/product code references found:"
+  try {
+    const output = execSync(
+      `npm pack --dry-run --json --ignore-scripts --cache "${cacheDir}"`,
+      {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      }
     );
-    for (const violation of violations) {
-      console.error(`- ${violation.file}:${violation.line} (${violation.label})`);
+
+    const parsed = parseNpmPackJson(output);
+    const files = Array.isArray(parsed) && parsed[0]?.files ? parsed[0].files : [];
+    const paths = files.map((entry) => entry.path);
+    verifyPackagePathInventory(paths);
+
+    const forbiddenCodeReferencePatterns = [
+      {
+        label: "private monorepo reference",
+        regex: /\bplasius-ltd-site\b/i,
+      },
+      {
+        label: "Plasius Ltd private reference",
+        regex: /\bplasius(?:\s+|-)ltd\b/i,
+      },
+      {
+        label: "proprietary PGP artifact reference",
+        regex: /\bpgp[-_a-z0-9]*\b/i,
+      },
+      {
+        label: "proprietary Lunari artifact reference",
+        regex: /\blunari\b/i,
+      },
+      {
+        label: "proprietary Pixelverse artifact reference",
+        regex: /\bpixelverse\b/i,
+      },
+    ];
+
+    const codeRoots = ["src", "tests", "demo"];
+    const codeExtensions = new Set([
+      ".ts",
+      ".tsx",
+      ".js",
+      ".mjs",
+      ".cjs",
+      ".json",
+    ]);
+    const violations = scanCodeReferences(
+      codeRoots,
+      codeExtensions,
+      forbiddenCodeReferencePatterns
+    );
+
+    if (violations.length > 0) {
+      const labels = [...new Set(violations.map(({ label }) => label))].sort();
+      throw new Error(
+        `Forbidden private/product code references were found (${violations.length}; ${labels.join(", ")}); values were not logged.`
+      );
     }
-    process.exit(1);
+
+    console.log("Public package check passed.");
+  } finally {
+    fs.rmSync(cacheDir, { force: true, recursive: true });
+  }
+}
+
+function verifyStdinPackageInventory() {
+  const input = fs.readFileSync(0);
+  if (input.byteLength > 16 * 1024 * 1024) {
+    throw new Error("Packed path inventory exceeds the 16 MiB limit.");
   }
 
-  console.log("Public package check passed.");
+  const paths = input.toString("utf8").split(/\r?\n/u).filter(Boolean);
+  verifyPackagePathInventory(paths);
+  console.log("Sealed package inventory check passed.");
+}
+
+function verifyPackagePathInventory(paths) {
+  const rawPaths = new Set();
+  const normalizedPaths = new Set();
+  let forbiddenCount = 0;
+
+  for (const candidate of paths) {
+    if (typeof candidate !== "string") {
+      throw new TypeError("Packed paths must be strings.");
+    }
+    const rawPath = candidate.startsWith("package/")
+      ? candidate.slice("package/".length)
+      : candidate;
+    const normalizedPath = normalizePackagePath(candidate);
+    if (rawPaths.has(rawPath) || normalizedPaths.has(normalizedPath)) {
+      throw new Error(
+        "Packed paths failed raw member identity or normalization-collision checks; values were not logged."
+      );
+    }
+    rawPaths.add(rawPath);
+    normalizedPaths.add(normalizedPath);
+    if (
+      FORBIDDEN_TARBALL_PATH_PATTERNS.some(({ regex }) =>
+        regex.test(normalizedPath)
+      )
+    ) {
+      forbiddenCount += 1;
+    }
+  }
+
+  if (forbiddenCount > 0) {
+    throw new Error(
+      `Forbidden publish path metadata was found (${forbiddenCount}); values were not logged.`
+    );
+  }
+}
+
+function normalizePackagePath(candidate) {
+  const normalized = path.posix
+    .normalize(candidate.replaceAll("\\", "/"))
+    .replace(/^(?:\.\/)+/u, "")
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US");
+  return normalized.startsWith("package/")
+    ? normalized.slice("package/".length)
+    : normalized;
 }
 
 function parseNpmPackJson(rawOutput) {
@@ -169,4 +218,17 @@ function collectFiles(root, extensions) {
   return files;
 }
 
-main();
+if (require.main === module) {
+  try {
+    main();
+  } catch (error) {
+    console.error(`Public package check failed: ${error.message}`);
+    process.exitCode = 1;
+  }
+}
+
+module.exports = {
+  main,
+  normalizePackagePath,
+  verifyPackagePathInventory,
+};
