@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [0.1.0] - 2026-08-30
+
 - Add deterministic bounded PVOX 1.0 shell compilation, independent validation,
   CPU four-view review rendering, browser decoding, and disposable surface-cache
   generation for the ChatGPT-to-GPU-Demo demonstration.
@@ -25,3 +39,6 @@ All notable changes to this project are documented in this file.
   released `@plasius/schema` v1.4.2 package template.
 - Make dependency-tree auditing fail closed and pin patched build-tool
   transitive versions used by the release path.
+
+
+[0.1.0]: https://github.com/Plasius-LTD/gpu-model-voxel/releases/tag/v0.1.0
