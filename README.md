@@ -47,6 +47,11 @@ import {
 } from "@plasius/gpu-model-voxel";
 ```
 
+The disposable surface cache includes a surface-palette index for every
+emitted vertex, allowing compatibility renderers to retain the decoded PVOX
+colour, roughness, metallic, specular, and emission grouping without making
+the triangle cache a catalog artifact.
+
 See [ADR 0001](./docs/adrs/adr-0001-pvox-static-preview-boundary.md)
 and [TDR 0001](./docs/tdrs/tdr-0001-pvox-v1-record-layouts.md) for the
 closed demo profile and exact records.
@@ -63,6 +68,15 @@ npm run test:coverage
 npm run build
 npm run pack:check
 ```
+
+## Release integrity
+
+GitHub CI and CD follow the released `@plasius/schema` v1.4.2 package
+template, using privacy checks, exact-main validation, immutable tarball and
+SBOM sealing, provenance, and npm OIDC. The initial `0.1.0` publication may
+use only the explicit, time-limited `bootstrap_first_publish` production gate
+while the package is absent; the credential is removed after trusted
+publishing is bound.
 
 ## Licence
 

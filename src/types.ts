@@ -1,57 +1,22 @@
-export type Vec3 = readonly [number, number, number];
-export type Vec4 = readonly [number, number, number, number];
+import type {
+  GpuModelStaticDemoCompilerInput,
+  GpuModelStaticDemoMaterial,
+  GpuModelStaticDemoWorldTriangle,
+  GpuModelVec3,
+  GpuModelVec4,
+} from "@plasius/gpu-model-core";
 
-export interface PvoxStaticMaterialInputV1 {
-  readonly sourceMaterialId: string | null;
-  readonly sourceMaterialName?: string;
-  readonly sourceWorkflow: "metallic-roughness" | "unlit";
-  readonly baseColorFactor: Vec4;
-  readonly roughnessFactor: number;
-  readonly metallicFactor: number;
-  readonly emissiveFactor: Vec3;
-  readonly doubleSided: boolean;
-}
+export type Vec3 = GpuModelVec3;
+export type Vec4 = GpuModelVec4;
 
-export interface PvoxStaticTriangleInputV1 {
-  readonly positions: readonly [Vec3, Vec3, Vec3];
-  readonly normals: readonly [Vec3, Vec3, Vec3];
-  readonly materialIndex: number;
-  readonly sourceNodeId: string;
-  readonly sourceMeshId: string;
-  readonly sourcePrimitiveId: string;
-  readonly sourceTriangleIndex: number;
-  readonly bounds?: {
-    readonly min: Vec3;
-    readonly max: Vec3;
-  };
-}
+/** Exact texture-free surface projection emitted by the verified model core. */
+export type PvoxStaticMaterialInputV1 = GpuModelStaticDemoMaterial;
 
-/** Structural form returned by gpu-model-core's verified static-demo extractor. */
-export interface PvoxStaticCompilerInputV1 {
-  readonly profileVersion: "plasius.gpu-model-static-demo/1";
-  readonly canonicalDocumentHash: string;
-  readonly sourceEvidence: {
-    readonly sourceFormat: string;
-    readonly sourceContentHash: string;
-    readonly converterId: string;
-    readonly converterVersion: string;
-    readonly provider?: string;
-  };
-  readonly coordinateSystem: {
-    readonly unit: "metre";
-    readonly upAxis: "y";
-    readonly forwardAxis: "-z";
-    readonly handedness: "right";
-    readonly winding: "counter-clockwise";
-    readonly origin: "floor-centred";
-  };
-  readonly bounds: {
-    readonly min: Vec3;
-    readonly max: Vec3;
-  };
-  readonly materials: readonly PvoxStaticMaterialInputV1[];
-  readonly worldTriangles: readonly PvoxStaticTriangleInputV1[];
-}
+/** Exact byte-verified canonical triangle projection emitted by model core. */
+export type PvoxStaticTriangleInputV1 = GpuModelStaticDemoWorldTriangle;
+
+/** The only structural form accepted from gpu-model-core's verified extractor. */
+export type PvoxStaticCompilerInputV1 = GpuModelStaticDemoCompilerInput;
 
 export interface PvoxCompileOptionsV1 {
   readonly longestAxisCells?: number;
@@ -155,6 +120,8 @@ export interface PvoxSurfaceMeshV1 {
   readonly positions: Float32Array;
   readonly normals: Float32Array;
   readonly colors: Float32Array;
+  /** Surface palette index for every emitted vertex in the disposable cache. */
+  readonly surfaceIndices: Uint32Array;
   readonly indices: Uint32Array;
   readonly triangleCount: number;
   readonly bounds: {

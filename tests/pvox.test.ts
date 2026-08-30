@@ -119,6 +119,8 @@ describe("PVOX 1.0 static preview", () => {
     expect(mesh.triangleCount).toBeGreaterThan(0);
     expect(mesh.positions.length).toBe(mesh.normals.length);
     expect(mesh.colors.length / 4).toBe(mesh.positions.length / 3);
+    expect(mesh.surfaceIndices.length).toBe(mesh.positions.length / 3);
+    expect(new Set(mesh.surfaceIndices)).toEqual(new Set([0]));
 
     const views = await renderPvoxReviewViewsV1(decoded, { width: 64, height: 64 });
     expect(views.map((view) => view.name)).toEqual(PVOX_REVIEW_VIEW_ORDER_V1);

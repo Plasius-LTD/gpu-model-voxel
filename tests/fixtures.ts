@@ -24,6 +24,18 @@ function triangle(a: Vec3, b: Vec3, c: Vec3, normal: Vec3, index: number): PvoxS
     sourceMeshId: "mesh-cube",
     sourcePrimitiveId: "primitive-cube",
     sourceTriangleIndex: index,
+    bounds: {
+      min: [
+        Math.min(a[0], b[0], c[0]),
+        Math.min(a[1], b[1], c[1]),
+        Math.min(a[2], b[2], c[2]),
+      ] as const,
+      max: [
+        Math.max(a[0], b[0], c[0]),
+        Math.max(a[1], b[1], c[1]),
+        Math.max(a[2], b[2], c[2]),
+      ] as const,
+    },
   });
 }
 
