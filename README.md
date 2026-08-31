@@ -73,10 +73,10 @@ npm run pack:check
 
 GitHub CI and CD follow the released `@plasius/schema` v1.4.2 package
 template, using privacy checks, exact-main validation, immutable tarball and
-SBOM sealing, provenance, and npm OIDC. The initial `0.1.0` publication may
-use only the explicit, time-limited `bootstrap_first_publish` production gate
-while the package is absent; the credential is removed after trusted
-publishing is bound.
+SBOM sealing, provenance, and npm OIDC. The first registry publication may use
+only the explicit, release-bound and time-limited `bootstrap_first_publish`
+production gate while the package is absent; the credential is removed after
+trusted publishing is bound.
 
 ## Licence
 

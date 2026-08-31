@@ -11,7 +11,9 @@ All notable changes to this project are documented in this file.
   - (placeholder)
 
 - **Fixed**
-  - (placeholder)
+  - Prevent project npm configuration from overriding authenticated user and
+    production release credentials, and bind the one-time first-publication
+    recovery to the next immutable release.
 
 - **Security**
   - (placeholder)

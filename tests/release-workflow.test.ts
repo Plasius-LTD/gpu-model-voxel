@@ -14,6 +14,10 @@ const cdWorkflow = readFileSync(
   new URL("../.github/workflows/cd.yml", import.meta.url),
   "utf8",
 );
+const projectNpmConfig = readFileSync(
+  new URL("../.npmrc", import.meta.url),
+  "utf8",
+);
 
 describe("release preparation workflow", () => {
   it("does not let checkout credentials override the release-prep app token", () => {
@@ -45,6 +49,13 @@ describe("release preparation workflow", () => {
     expect(cdWorkflow).toContain(
       'if: steps.release.outputs.should_publish_npm == \'true\' && inputs.bootstrap_first_publish != true',
     );
+    expect(cdWorkflow).toContain(
+      'if [ "${PACKAGE_VERSION}" != "0.1.1" ]; then',
+    );
+  });
+
+  it("does not let project npm configuration override release credentials", () => {
+    expect(projectNpmConfig).not.toMatch(/(?:_authToken|NODE_AUTH_TOKEN)/u);
   });
 
   it("runs Schema privacy and sealed-package checks in CI", () => {
