@@ -11,6 +11,20 @@ All notable changes to this project are documented in this file.
   - (placeholder)
 
 - **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [0.1.1] - 2026-08-31
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
   - Prevent project npm configuration from overriding authenticated user and
     production release credentials, and bind the one-time first-publication
     recovery to the next immutable release.
@@ -46,3 +60,4 @@ All notable changes to this project are documented in this file.
 
 
 [0.1.0]: https://github.com/Plasius-LTD/gpu-model-voxel/releases/tag/v0.1.0
+[0.1.1]: https://github.com/Plasius-LTD/gpu-model-voxel/releases/tag/v0.1.1
