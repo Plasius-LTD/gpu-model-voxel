@@ -76,7 +76,9 @@ template, using privacy checks, exact-main validation, immutable tarball and
 SBOM sealing, provenance, and npm OIDC. The first registry publication may use
 only the explicit, release-bound and time-limited `bootstrap_first_publish`
 production gate while the package is absent; the credential is removed after
-trusted publishing is bound.
+trusted publishing is bound. Release preparation advances to a new version
+instead of rewriting an incomplete release tag that belongs to an earlier
+immutable commit.
 
 ## Licence
 
