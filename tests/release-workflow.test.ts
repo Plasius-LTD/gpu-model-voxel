@@ -33,6 +33,15 @@ describe("release preparation workflow", () => {
     );
   });
 
+  it("does not reuse an incomplete release version whose tag points elsewhere", () => {
+    expect(workflow).toContain(
+      'CURRENT_TAG_SHA="$(git rev-list -n 1 "${CURRENT_TAG}" 2>/dev/null || true)"',
+    );
+    expect(workflow).toContain(
+      '[ -z "${CURRENT_TAG_SHA}" ] || [ "${CURRENT_TAG_SHA}" = "${CURRENT_HEAD_SHA}" ]',
+    );
+  });
+
   it("runs trusted pull-request and exact-main validation on hosted runners", () => {
     expect(ciWorkflow).toContain("name: Trusted head admission");
     expect(ciWorkflow.match(/^ {4}runs-on: ubuntu-latest$/gmu)).toHaveLength(3);

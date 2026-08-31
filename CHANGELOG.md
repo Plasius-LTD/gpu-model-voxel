@@ -14,6 +14,8 @@ All notable changes to this project are documented in this file.
   - Prevent project npm configuration from overriding authenticated user and
     production release credentials, and bind the one-time first-publication
     recovery to the next immutable release.
+  - Cut a new release version when an incomplete version tag belongs to a
+    different immutable commit instead of attempting to reuse or rewrite it.
 
 - **Security**
   - (placeholder)
