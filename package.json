@@ -56,8 +56,8 @@
   },
   "homepage": "https://github.com/Plasius-LTD/gpu-model-voxel#readme",
   "dependencies": {
-    "@plasius/asset-contracts": "^0.4.2",
-    "@plasius/gpu-model-core": "^0.4.3",
+    "@plasius/asset-contracts": "^0.4.3",
+    "@plasius/gpu-model-core": "^0.4.4",
     "fflate": "^0.8.3"
   },
   "devDependencies": {
@@ -87,7 +87,7 @@
     }
   ],
   "overrides": {
-    "brace-expansion": "5.0.9",
+    "brace-expansion": "5.0.12",
     "esbuild": "0.28.2",
     "minimatch": "^10.2.1",
     "nanoid": "3.3.18",
