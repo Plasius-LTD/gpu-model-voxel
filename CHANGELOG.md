@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [0.1.7] - 2026-11-22
+
 - Refresh supported npm dependency and security tooling baselines; preserve runtime API contracts (weekly maintenance, 2026-11-22).
 
 - **Added**
@@ -147,3 +161,4 @@ All notable changes to this project are documented in this file.
 [0.1.4]: https://github.com/Plasius-LTD/gpu-model-voxel/releases/tag/v0.1.4
 [0.1.5]: https://github.com/Plasius-LTD/gpu-model-voxel/releases/tag/v0.1.5
 [0.1.6]: https://github.com/Plasius-LTD/gpu-model-voxel/releases/tag/v0.1.6
+[0.1.7]: https://github.com/Plasius-LTD/gpu-model-voxel/releases/tag/v0.1.7
