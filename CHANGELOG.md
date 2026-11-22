@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+- Consume the verified upstream security releases from the weekly dependency rollout; retain existing runtime contracts.
+
 - **Added**
   - (placeholder)
 

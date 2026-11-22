@@ -56,7 +56,7 @@
   },
   "homepage": "https://github.com/Plasius-LTD/gpu-model-voxel#readme",
   "dependencies": {
-    "@plasius/asset-contracts": "^0.8.3",
+    "@plasius/asset-contracts": "^0.8.4",
     "@plasius/gpu-model-core": "^0.7.2",
     "fflate": "^0.8.3"
   },
