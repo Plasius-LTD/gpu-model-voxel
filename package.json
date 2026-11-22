@@ -1,6 +1,6 @@
 {
   "name": "@plasius/gpu-model-voxel",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Deterministic PVOX compilation, validation, CPU review rendering, and browser-safe decoding.",
   "type": "module",
   "sideEffects": false,
